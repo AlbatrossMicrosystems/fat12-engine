@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # REPRO-01 / REPRO-02: build :core and run its full headless suite on a clean,
+  # pinned JDK 17 runner with no Android SDK, no device, no .planning dependency.
+  core-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 17 (Temurin, pinned)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Run :core test suite (fsck-tagged emit test excluded)
+        run: ./gradlew :core:test --no-daemon
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-test-results
+          path: core/build/test-results/test/*.xml
+
+  # D-04/05: independent dosfstools oracle. Emit engine-written FAT12 images and run
+  # fsck.fat -n on both. Gate mode = fail-on-nonzero (Wave-0 spike A2 confirmed both
+  # engine images are fsck-clean, exit 0, no warnings — see testdata/golden-spike-notes.md).
+  fsck-oracle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 17 (Temurin, pinned)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Install pinned dosfstools (4.2 = goldens' version)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dosfstools
+          mkfs.fat --version | grep -q '4\.2'   # fail CI if upstream drifts off 4.2
+      - name: Emit engine-written FAT12 images
+        run: ./gradlew :core:fsckEmit --no-daemon
+      - name: fsck engine output (independent oracle, fail-on-nonzero)
+        run: |
+          set -e
+          fsck.fat -n core/build/fsck/fresh.img
+          fsck.fat -n core/build/fsck/ops.img
