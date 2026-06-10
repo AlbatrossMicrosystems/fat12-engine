@@ -1,6 +1,7 @@
 # fat12-engine
 
 [![CI](https://github.com/AlbatrossMicrosystems/fat12-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/AlbatrossMicrosystems/fat12-engine/actions/workflows/ci.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20633047.svg)](https://doi.org/10.5281/zenodo.20633047)
 
 A dependency-free, pure-JVM **FAT12 write layer** with an atomic
 **verify-after-write + rollback** contract. Every multi-step mutation (file write,
