@@ -11,4 +11,4 @@ license: Apache-2.0
 repository-code: "https://github.com/AlbatrossMicrosystems/fat12-engine"
 version: 0.1.0
 date-released: 2026-06-10
-doi: "10.5281/zenodo.20633047"   # Zenodo concept DOI (resolves to the latest version)
+doi: "10.5281/zenodo.20633046"   # Zenodo concept DOI (all versions; always resolves to latest)
