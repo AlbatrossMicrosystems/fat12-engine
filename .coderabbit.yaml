@@ -1,0 +1,117 @@
+# CodeRabbit configuration for fat12-engine
+# Schema: https://docs.coderabbit.ai/reference/yaml-template
+# A dependency-free pure-JVM FAT12 write engine whose central guarantee is an
+# atomic verify-after-write + rollback contract. Reviews are tuned to protect
+# that contract and the mkfs.fat golden conformance, and to ignore binaries.
+
+language: en-US
+
+tone_instructions: >
+  This is a correctness-critical, dependency-free FAT12 write engine. Favor
+  precise, low-noise feedback. Treat the verify-after-write + rollback contract
+  and byte-for-byte golden conformance as invariants that must never silently
+  regress. Prefer questions over assertions when on-disk layout is involved.
+
+reviews:
+  # "assertive" surfaces more potential issues; appropriate for a low-traffic,
+  # correctness-critical engine where missing a bug is worse than an extra note.
+  profile: assertive
+
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  collapse_walkthrough: false
+  sequence_diagrams: false
+  estimate_code_review_effort: true
+  assess_linked_issues: true
+  related_issues: true
+  related_prs: true
+  suggested_labels: true
+  auto_apply_labels: false
+  poem: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    # Review PRs targeting the default branch (adjust if you add release branches).
+    base_branches:
+      - "main"
+      - "master"
+
+  # Files CodeRabbit should NOT review (binaries, build output, lockable assets).
+  # The golden .img fixtures are byte-reproducible binaries — diffing them is noise.
+  path_filters:
+    - "!**/*.img"
+    - "!**/*.bin"
+    - "!**/build/**"
+    - "!**/.gradle/**"
+    - "!**/.kotlin/**"
+    - "!gradle/wrapper/gradle-wrapper.jar"
+    - "!**/*.zip"
+
+  # Targeted review guidance per area of the codebase.
+  path_instructions:
+    - path: "core/src/main/kotlin/com/ams/fat12ex/core/Fat12Volume.kt"
+      instructions: >
+        This is the public facade and the heart of the write path. EVERY
+        multi-step mutation (writeFile, mkdir, rename, delete, setVolumeLabel,
+        setAttributes) MUST: (1) capture each touched sector into an UndoLog
+        BEFORE writing, (2) read back and byte-compare every written data
+        cluster/region, and (3) on ANY failure (IOException, verify mismatch,
+        disk-full) call undoLog.rollback() leaving the volume byte-for-byte at
+        its pre-operation state, then commit() only on full success. Flag any
+        change that writes before capturing, skips verifyRegion, swallows an
+        exception without rollback, or commits on a partial path. Recoverable
+        outcomes must return a Fat12Result variant, not throw.
+    - path: "core/src/main/kotlin/com/ams/fat12ex/core/UndoLog.kt"
+      instructions: >
+        The rollback primitive. Scrutinize for: capture/restore asymmetry,
+        ordering of restores, partial-rollback on error, and any state that
+        could leave the device dirty after rollback(). This file underpins the
+        crash-consistency claim (C-A) — treat correctness here as paramount.
+    - path: "core/src/main/kotlin/com/ams/fat12ex/core/Fat12Formatter.kt"
+      instructions: >
+        Output must remain byte-for-byte identical to the dosfstools mkfs.fat
+        golden images (claim C-C). Flag any change to BPB fields, reserved
+        sectors, FAT count, root entry count, or boot-sector offsets that could
+        alter formatted bytes without a corresponding golden-image update and a
+        note in testdata/README.md.
+    - path: "core/src/main/kotlin/com/ams/fat12ex/core/**/*.kt"
+      instructions: >
+        Pure-JVM, dependency-free engine. Flag any new third-party runtime
+        dependency or Android API usage. Watch endianness (FAT is little-endian),
+        12-bit FAT entry packing across byte boundaries, off-by-one in
+        cluster/sector arithmetic, and signed/unsigned byte handling
+        (use `and 0xFF` when reading bytes as ints).
+    - path: "core/src/test/kotlin/**/*.kt"
+      instructions: >
+        Tests substantiate the C-A/C-B/C-C claims. New engine behavior should
+        come with tests. Flag assertions weakened or removed without
+        justification, and rollback tests that no longer assert byte-for-byte
+        pre-op equality.
+    - path: "**/*.md"
+      instructions: >
+        Documentation. The README usage example and claims table must stay
+        consistent with the public API. Flag drift between documented method
+        signatures / Fat12Result variants and the actual code.
+
+  tools:
+    detekt:
+      enabled: true
+    gitleaks:
+      enabled: true
+    markdownlint:
+      enabled: true
+    github-checks:
+      enabled: true
+    yamllint:
+      enabled: true
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  learnings:
+    scope: auto
+  issues:
+    scope: auto
