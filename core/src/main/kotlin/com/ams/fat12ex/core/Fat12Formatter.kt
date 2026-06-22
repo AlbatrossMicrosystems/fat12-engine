@@ -69,10 +69,11 @@ class Fat12Formatter(private val device: BlockDevice) {
 
         val geometry = computeGeometry(totalSectors, bytesPerSector)
             ?: return Fat12Result.TooLarge(actualBytes = device.blocks * bytesPerSector)
-
-        // Never emit near-FAT16 geometry. The geometry loop already
-        // bounds clusters to 1 until 4069, but assert before writing so a future
-        // refactor cannot silently breach the FAT12-only integrity boundary.
+    /**
+        * Never emit near-FAT16 geometry. The geometry loop already
+        * bounds clusters to 1 until 4069, but assert before writing so a future
+        * refactor cannot silently breach the FAT12-only integrity boundary.
+        */
         check(geometry.clusters < 4069) {
             "computed clusterCount ${geometry.clusters} >= 4069 violates FAT12 boundary"
         }
