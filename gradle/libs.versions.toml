@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.30"
+kotlin = "2.4.0"
 junitJupiter = "5.11.4"
 jqwik = "1.10.1"
 kotlinxCoroutinesTest = "1.11.0"
