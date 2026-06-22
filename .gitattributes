@@ -1,0 +1,3 @@
+gradlew eol=lf diff=sh
+gradlew.bat eol=crlf diff=batch
+gradle/wrapper/gradle-wrapper.jar binary diff=binary
