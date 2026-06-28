@@ -12,7 +12,11 @@ package com.ams.fat12ex.core
 sealed class Fat12Result<out T> {
     data class Ok<T>(val value: T) : Fat12Result<T>()
     data class NameConflict(val name: String) : Fat12Result<Nothing>()
-    object DiskFull : Fat12Result<Nothing>()
+    object DiskFull : Fat12Result<Nothing>() {
+        // Stable, human-readable rendering (an `object` otherwise inherits the
+        // Foo@hash default) so getOrThrow()'s message reads "...not Ok: DiskFull".
+        override fun toString(): String = "DiskFull"
+    }
     data class TooLarge(val actualBytes: Long) : Fat12Result<Nothing>()
     data class NotFound(val path: String) : Fat12Result<Nothing>()
     data class InvalidName(val name: String, val reason: String) : Fat12Result<Nothing>()

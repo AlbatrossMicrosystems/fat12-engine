@@ -32,7 +32,11 @@ class Fat12ResultAccessorsTest {
         assertFalse(result.isOk)
         assertTrue(result.isError)
         assertNull(result.getOrNull())
-        assertThrows<IllegalStateException> { result.getOrThrow() }
+        val ex = assertThrows<IllegalStateException> { result.getOrThrow() }
+        assertTrue(
+            ex.message?.contains("NotFound(path=/MISSING.TXT)") == true,
+            "message must describe the non-Ok outcome, was: ${ex.message}",
+        )
     }
 
     @Test
@@ -41,7 +45,13 @@ class Fat12ResultAccessorsTest {
         assertFalse(result.isOk)
         assertTrue(result.isError)
         assertNull(result.getOrNull())
-        assertThrows<IllegalStateException> { result.getOrThrow() }
+        val ex = assertThrows<IllegalStateException> { result.getOrThrow() }
+        // DiskFull is a singleton object; its message must be the stable "DiskFull",
+        // not the inherited Foo@hash default.
+        assertTrue(
+            ex.message?.contains("DiskFull") == true && ex.message?.contains("@") != true,
+            "message must read 'DiskFull', was: ${ex.message}",
+        )
     }
 
     @Test
