@@ -26,6 +26,6 @@ non-obvious).
 
 - [ ] Tests added or updated for the change.
 - [ ] `./gradlew :core:test` passes locally.
-- [ ] Change is scoped to the `:core` engine (the Android demonstrator is a separate repo).
+- [ ] Change is scoped to the `:core` engine (the Android demonstrator is separate and not part of this repository).
 - [ ] Golden images under `core/src/testFixtures/resources/golden/` are unchanged (or the PR explains why they were regenerated, per `testdata/README.md`).
 - [ ] PR is focused on one logical change.
