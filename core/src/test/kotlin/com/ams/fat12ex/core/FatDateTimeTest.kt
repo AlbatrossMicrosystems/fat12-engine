@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -135,6 +136,27 @@ class FatDateTimeTest {
         )
         assertNull(entry.createdDateOrNull())
         assertNull(entry.modifiedDateOrNull())
+        assertNull(entry.modifiedDateTimeOrNull())
+    }
+
+    @Test
+    fun entryAccessors_corruptModifiedTime_decoderThrowsButAccessorIsNull() {
+        // modifiedTime = 0x001E has a seconds-field of 30 -> 60s, which is not a
+        // valid LocalTime. The low-level decoder rejects it; the entry accessor
+        // swallows that to null rather than propagating the exception.
+        assertThrows<java.time.DateTimeException> { decodeFatTime(0x001E) }
+
+        val entry = Fat12Entry(
+            name = "BROKEN.TXT",
+            shortName = "BROKEN  TXT",
+            isDirectory = false,
+            size = 1,
+            firstCluster = 2,
+            attributes = 0x20,
+            createdDate = 0x5CD2,   // valid date
+            modifiedDate = 0x58C1,  // valid date
+            modifiedTime = 0x001E,  // corrupt time
+        )
         assertNull(entry.modifiedDateTimeOrNull())
     }
 }
