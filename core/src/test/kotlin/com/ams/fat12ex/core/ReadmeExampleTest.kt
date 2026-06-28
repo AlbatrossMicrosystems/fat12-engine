@@ -1,6 +1,7 @@
 package com.ams.fat12ex.core
 
 import com.ams.fat12ex.core.testutil.InMemoryBlockDevice
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -41,10 +42,13 @@ class ReadmeExampleTest {
         assertTrue(entry != null, "HELLO.TXT must appear in the root listing")
         assertEquals(payload.size.toLong(), entry!!.size)
 
-        // Read the file back — the bytes must round-trip.
+        // Read the file back — the raw bytes must round-trip exactly (the README's
+        // String(read.value) decode is the human-facing view of that same payload).
         val read = volume.readFile("/HELLO.TXT")
         assertInstanceOf(Fat12Result.Ok::class.java, read)
-        assertEquals("hello fat12", String((read as Fat12Result.Ok).value))
+        val readBytes = (read as Fat12Result.Ok).value
+        assertArrayEquals(payload, readBytes)
+        assertEquals("hello fat12", String(readBytes))
 
         volume.close()
     }
