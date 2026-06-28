@@ -17,3 +17,23 @@ sealed class Fat12Result<out T> {
     data class NotFound(val path: String) : Fat12Result<Nothing>()
     data class InvalidName(val name: String, val reason: String) : Fat12Result<Nothing>()
 }
+
+/** True when this result is [Fat12Result.Ok]. */
+val Fat12Result<*>.isOk: Boolean get() = this is Fat12Result.Ok
+
+/** True when this result is any non-[Fat12Result.Ok] outcome. */
+val Fat12Result<*>.isError: Boolean get() = this !is Fat12Result.Ok
+
+/** The success value, or `null` for any non-[Fat12Result.Ok] outcome. */
+fun <T> Fat12Result<T>.getOrNull(): T? = (this as? Fat12Result.Ok)?.value
+
+/**
+ * The success value, or throw [IllegalStateException] describing the non-[Fat12Result.Ok]
+ * outcome. Use only when a non-Ok result is a programming error at the call site; prefer
+ * [getOrNull] or an exhaustive `when` for recoverable handling.
+ */
+fun <T> Fat12Result<T>.getOrThrow(): T =
+    when (this) {
+        is Fat12Result.Ok -> value
+        else -> error("Fat12Result was not Ok: $this")
+    }
