@@ -745,10 +745,11 @@ class Fat12Volume(private val device: BlockDevice) : Closeable {
      * [path] IN PLACE under the INT-02 verify-after-write + rollback contract
      * (structurally modelled on [setVolumeLabel]).
      *
-     * Only the four user bits are written: READ_ONLY (0x01), HIDDEN (0x02),
-     * SYSTEM (0x04), ARCHIVE (0x20) — the [USER_ATTR_MASK]. The non-user bits
-     * ATTR_VOLUME_ID (0x08) and ATTR_DIRECTORY (0x10) — the [PRESERVE_ATTR_MASK]
-     * — are PRESERVED from the existing byte, so a caller can never flip a
+     * Only the four user bits are written: [FatAttributes.READ_ONLY] (0x01),
+     * [FatAttributes.HIDDEN] (0x02), [FatAttributes.SYSTEM] (0x04),
+     * [FatAttributes.ARCHIVE] (0x20) — the [USER_ATTR_MASK]. The non-user bits
+     * [FatAttributes.VOLUME_ID] (0x08) and [FatAttributes.DIRECTORY] (0x10) — the
+     * [PRESERVE_ATTR_MASK] — are PRESERVED from the existing byte, so a caller can never flip a
      * folder into a file, clear the directory bit, or set the volume-ID bit
      * (Pitfall 4 / T-05-01). The LFN composite (0x0F) never reaches here because
      * [findEntryByName] resolves only short entries.
