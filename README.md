@@ -91,6 +91,9 @@ All write operations return a sealed `Fat12Result` (`Ok`, `NotFound`, `NameConfl
 `DiskFull`, `InvalidName`, ...); unrecoverable I/O or verify faults roll back and surface
 as exceptions after the volume has been restored to its pre-operation bytes.
 
+This round-trip is exercised by the build (`ReadmeExampleTest`) so the snippet stays in
+sync with the public API.
+
 ## Claims and the tests that substantiate them
 
 The engine makes three substantiable correctness claims. Each maps to specific `:core`
