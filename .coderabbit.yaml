@@ -7,10 +7,9 @@
 language: en-US
 
 tone_instructions: >
-  This is a correctness-critical, dependency-free FAT12 write engine. Favor
-  precise, low-noise feedback. Treat the verify-after-write + rollback contract
-  and byte-for-byte golden conformance as invariants that must never silently
-  regress. Prefer questions over assertions when on-disk layout is involved.
+  Correctness-critical FAT12 write engine. Favor precise, low-noise feedback.
+  Treat verify-after-write + rollback and byte-for-byte golden conformance as
+  invariants. Prefer questions over assertions on disk-layout changes.
 
 reviews:
   # "assertive" surfaces more potential issues; appropriate for a low-traffic,
