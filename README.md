@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/AlbatrossMicrosystems/fat12-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/AlbatrossMicrosystems/fat12-engine/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20633046.svg)](https://doi.org/10.5281/zenodo.20633046)
+[![ResearchGate](https://img.shields.io/badge/ResearchGate-Preprint-00CCBB?logo=researchgate&logoColor=white)](https://www.researchgate.net/publication/407548130_fat12-engine_a_dependency-free_FAT12_write_layer_with_atomic_verify-after-write_rollback)
 
 A dependency-free, pure-JVM **FAT12 write layer** with an atomic
 **verify-after-write + rollback** contract. Every multi-step mutation (file write,
